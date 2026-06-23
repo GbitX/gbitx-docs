@@ -32,6 +32,7 @@ const SECTIONS = [
   { id: 'getting-started',  key: 'developer.docs.nav.gettingStarted', fallback: 'Getting Started' },
   { id: 'authentication',   key: 'developer.docs.nav.authentication', fallback: 'Authentication' },
   { id: 'payments',         key: 'developer.docs.nav.payments',       fallback: 'Payments' },
+  { id: 'payment-links',    key: 'developer.docs.nav.paymentLinks',   fallback: 'Payment Links' },
   { id: 'pricing',          key: 'developer.docs.nav.pricing',        fallback: 'Pricing & Fees' },
   { id: 'inline-checkout',  key: 'developer.docs.nav.inlineCheckout', fallback: 'Inline Checkout (iframe)' },
   { id: 'js-sdk',           key: 'developer.docs.nav.jsSdk',          fallback: 'JavaScript SDK' },
@@ -388,6 +389,179 @@ export default function ApiDocs() {
               <tr><td style={s.td}><code style={s.inlineCode}>FAILED</code></td><td style={s.td}>{t('developer.docs.lifecycle.failed', 'Payment failed due to a system error.')}</td></tr>
             </tbody>
           </table>
+        </section>
+
+        {/* ── Payment Links ─────────────────────────────────────────────
+            Sandwiched between Payments (the "I'm writing code" path)
+            and Pricing (the "what does it cost" answer) so a reader
+            sees the no-code alternative right next to the developer
+            integration. */}
+        <section id="payment-links" style={s.section}>
+          <h2 style={s.h2}>{t('developer.docs.nav.paymentLinks', 'Payment Links')}</h2>
+          <p style={s.intro}>
+            {t(
+              'developer.docs.paymentLinks.intro',
+              'Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at pay.gbitx.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.',
+            )}
+          </p>
+
+          <h3 style={s.h3}>{t('developer.docs.paymentLinks.flavorsTitle', 'Two flavors')}</h3>
+          <p style={s.text}>
+            <strong>{t('developer.docs.paymentLinks.singleUseTitle', 'Single-use')}</strong>
+            {' — '}
+            {t(
+              'developer.docs.paymentLinks.singleUseBody',
+              "Set maxUses to 1. The link works once; after a customer pays (or even just opens the checkout) it stops accepting new sessions. Use these for invoices addressed to a specific customer, or any payment you don't want shared.",
+            )}
+          </p>
+          <p style={s.text}>
+            <strong>{t('developer.docs.paymentLinks.reusableTitle', 'Reusable')}</strong>
+            {' — '}
+            {t(
+              'developer.docs.paymentLinks.reusableBody',
+              'Leave maxUses unset (or set a higher cap like 100). The link can be paid any number of times. Each click mints a fresh Payment row. Ideal for product pages, donation buttons, and tip jars.',
+            )}
+          </p>
+
+          <h3 style={s.h3}>{t('developer.docs.paymentLinks.modesTitle', 'Fixed amount vs. customer enters')}</h3>
+          <p style={s.text}>
+            {t(
+              'developer.docs.paymentLinks.modesBody',
+              "Set amountMode to FIXED when you know exactly what to charge (a $29.99 subscription, a 0.05 BTC invoice). Set it to CUSTOMER_ENTERS when you don't — the landing page shows a number input with optional min/max bounds. Useful for donations, top-ups, and pay-what-you-want.",
+            )}
+          </p>
+
+          <h3 style={s.h3}>{t('developer.docs.paymentLinks.urlShape', 'The share URL')}</h3>
+          <p style={s.text}>
+            {t(
+              'developer.docs.paymentLinks.urlBody',
+              'Every link is identified by a cryptographically random 16-character code. The URL you share with customers looks like:',
+            )}
+          </p>
+          <Code lang="text">{`${PAYMENT_PAGE_URL}/l/Y7M034CB2WYFG5KW`}</Code>
+          <p style={s.text}>
+            {t(
+              'developer.docs.paymentLinks.urlSecurity',
+              "The code carries 80 bits of entropy — enumeration by guessing is computationally infeasible. We additionally rate-limit lookups by IP and 404 every non-live state (inactive / expired / over-cap / merchant suspended) with the same response so an attacker can't distinguish a real-but-disabled link from a non-existent one.",
+            )}
+          </p>
+
+          {/* ── Endpoints ──────────────────────────────────────────────── */}
+          <h3 style={s.h3}>{t('developer.docs.paymentLinks.api', 'API reference')}</h3>
+          <p style={s.text}>
+            {t(
+              'developer.docs.paymentLinks.apiBody',
+              'You can manage links from the dashboard OR via the merchant API. The dashboard UI is just a thin wrapper around these endpoints. Auth is the same as every other merchant-side endpoint — your session cookie.',
+            )}
+          </p>
+
+          <Endpoint method="POST" path="/v1/payment-links" auth="Session"
+            description={t('developer.docs.paymentLinks.ep.create', 'Create a new payment link. Returns the link + a shareUrl ready to copy.')} />
+
+          <h4 style={s.h4}>{t('developer.docs.paymentLinks.requestBody', 'Request body')}</h4>
+          <Param name="title" type="string" required>
+            {t('developer.docs.paymentLinks.params.title', 'Up to 120 chars. Shown at the top of the public landing page (e.g. "Pro plan — monthly").')}
+          </Param>
+          <Param name="description" type="string">
+            {t('developer.docs.paymentLinks.params.description', 'Optional. Up to 500 chars. Shown under the title.')}
+          </Param>
+          <Param name="imageUrl" type="string">
+            {t('developer.docs.paymentLinks.params.imageUrl', 'Optional. https:// only. Renders above the title on the landing page (max 200 px tall).')}
+          </Param>
+          <Param name="mode" type="string" required>
+            {t('developer.docs.paymentLinks.params.mode', "'SANDBOX' or 'LIVE'. LIVE requires your merchant account to be APPROVED.")}
+          </Param>
+          <Param name="amountMode" type="string" required>
+            {t('developer.docs.paymentLinks.params.amountMode', "'FIXED' (you set the amount) or 'CUSTOMER_ENTERS' (customer types it on the landing).")}
+          </Param>
+          <Param name="fixedAmount" type="number">
+            {t('developer.docs.paymentLinks.params.fixedAmount', 'Required when amountMode = FIXED. 0.01 to 1,000,000.')}
+          </Param>
+          <Param name="currency" type="string">
+            {t('developer.docs.paymentLinks.params.currency', 'ISO 4217 code (e.g. USD, EUR). Required when amountMode = FIXED. Optional restriction when CUSTOMER_ENTERS — null lets the customer pick.')}
+          </Param>
+          <Param name="minAmount" type="number">
+            {t('developer.docs.paymentLinks.params.minAmount', 'Optional bound for amountMode = CUSTOMER_ENTERS. Enforced server-side at checkout.')}
+          </Param>
+          <Param name="maxAmount" type="number">
+            {t('developer.docs.paymentLinks.params.maxAmount', 'Optional bound for amountMode = CUSTOMER_ENTERS. Enforced server-side at checkout.')}
+          </Param>
+          <Param name="maxUses" type="integer">
+            {t('developer.docs.paymentLinks.params.maxUses', 'Optional. Caps how many payments the link can mint. Leave null for unlimited. Set to 1 for a single-use invoice link.')}
+          </Param>
+          <Param name="expiresAt" type="ISO 8601 string">
+            {t('developer.docs.paymentLinks.params.expiresAt', 'Optional. Link returns 404 to customers after this timestamp regardless of usedCount.')}
+          </Param>
+          <Param name="successUrl" type="string">
+            {t('developer.docs.paymentLinks.params.successUrl', 'Optional. Where to send the customer after a confirmed payment. https:// only.')}
+          </Param>
+          <Param name="cancelUrl" type="string">
+            {t('developer.docs.paymentLinks.params.cancelUrl', 'Optional. Where to send the customer if they cancel on the checkout.')}
+          </Param>
+          <Param name="metadata" type="object">
+            {t('developer.docs.paymentLinks.params.metadata', 'Optional JSON object. Copied into every Payment row + every webhook payload as paymentLinkCode + your fields, so you can correlate confirmations back to the source link. Max 4 KB.')}
+          </Param>
+
+          <h4 style={s.h4}>{t('developer.docs.paymentLinks.example', 'Example request')}</h4>
+          <Code lang="bash">{`curl -X POST ${BASE_URL}/v1/payment-links \\
+  -H "Cookie: gw_token=<your session>" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "title": "Pro plan — monthly",
+    "description": "Recurring subscription",
+    "mode": "LIVE",
+    "amountMode": "FIXED",
+    "fixedAmount": 29.99,
+    "currency": "USD",
+    "maxUses": null,
+    "successUrl": "https://yourstore.com/welcome",
+    "metadata": { "plan": "pro" }
+  }'`}</Code>
+
+          <h4 style={s.h4}>{t('developer.docs.paymentLinks.response', 'Response')}</h4>
+          <Code lang="json">{`{
+  "success": true,
+  "link": {
+    "id": "ckxyz...",
+    "code": "Y7M034CB2WYFG5KW",
+    "title": "Pro plan — monthly",
+    "mode": "LIVE",
+    "amountMode": "FIXED",
+    "fixedAmount": "29.99",
+    "currency": "USD",
+    "active": true,
+    "usedCount": 0,
+    "createdAt": "2026-06-23T07:00:00.000Z"
+  },
+  "shareUrl": "${PAYMENT_PAGE_URL}/l/Y7M034CB2WYFG5KW"
+}`}</Code>
+
+          <Endpoint method="GET" path="/v1/payment-links" auth="Session"
+            description={t('developer.docs.paymentLinks.ep.list', 'List your links. Cursor-paginated; filter by ?mode= and ?active=.')} />
+          <Endpoint method="GET" path="/v1/payment-links/:id" auth="Session"
+            description={t('developer.docs.paymentLinks.ep.detail', 'Link detail + usage stats (total, confirmed, in-flight, USD volume) + 10 most-recent payments minted from this link.')} />
+          <Endpoint method="PATCH" path="/v1/payment-links/:id" auth="Session"
+            description={t('developer.docs.paymentLinks.ep.patch', 'Edit non-immutable fields: title, description, active, maxUses, expiresAt, success/cancelUrl, amount bounds, metadata. amountMode and mode cannot be changed — create a new link instead.')} />
+          <Endpoint method="DELETE" path="/v1/payment-links/:id" auth="Session"
+            description={t('developer.docs.paymentLinks.ep.delete', 'Soft-delete. The link 404s for customers immediately; historical payments minted from it remain intact in your dashboard.')} />
+
+          {/* ── Customer flow ─────────────────────────────────────────── */}
+          <h3 style={s.h3}>{t('developer.docs.paymentLinks.customerFlow', 'Customer flow')}</h3>
+          <p style={s.text}>
+            {t(
+              'developer.docs.paymentLinks.flowBody',
+              'A customer clicks your share URL. The public landing renders the link title, description, image, and either the fixed amount or an input. They press Pay — that mints a Payment row (with a paymentLinkId pointing back to your link) and bounces them to the standard hosted checkout. From there the existing payment lifecycle takes over: coin selection, deposit address + QR, confirmations, and the same set of webhook events you see on direct-API payments. The customer never knows they came in through a link.',
+            )}
+          </p>
+
+          <div style={s.callout}>
+            <strong>{t('developer.docs.paymentLinks.calloutTitle', 'Webhook tip')}</strong>
+            {' — '}
+            {t(
+              'developer.docs.paymentLinks.calloutBody',
+              'Every Payment created from a link carries paymentLinkId on the row + paymentLinkCode in metadata. Both surface in the webhook payload so you can split confirmations by source link without making an extra API call.',
+            )}
+          </div>
         </section>
 
         {/* ── Pricing & Fees ──────────────────────────────────────────── */}
