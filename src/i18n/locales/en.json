@@ -1933,7 +1933,8 @@
         "coinsRates": "Coins & Rates",
         "errors": "Errors",
         "rateLimits": "Rate Limits",
-        "postman": "Postman Collection"
+        "postman": "Postman Collection",
+        "paymentLinks": "Payment Links"
       },
       "quickExample": "Quick example",
       "keyLimits": "Key limits",
@@ -2130,7 +2131,52 @@
         "underpaid": "Amount received is less than required."
       },
       "whatToDoResponse": "<strong>What to do with the response:</strong> Redirect your customer to <code>paymentUrl</code>. They will select a cryptocurrency, see the deposit address, and send the payment. The payment expires after 60 minutes.",
-      "whyIdempotency": "<strong>Why use it:</strong> if your HTTP client retries a POST after a network blip, without an idempotency key you get two payment rows for one logical order. With the key, the retry returns the original payment."
+      "whyIdempotency": "<strong>Why use it:</strong> if your HTTP client retries a POST after a network blip, without an idempotency key you get two payment rows for one logical order. With the key, the retry returns the original payment.",
+      "paymentLinks": {
+        "intro": "Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at pay.gbitx.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.",
+        "flavorsTitle": "Two flavors",
+        "singleUseTitle": "Single-use",
+        "singleUseBody": "Set maxUses to 1. The link works once; after a customer pays (or even just opens the checkout) it stops accepting new sessions. Use these for invoices addressed to a specific customer, or any payment you don't want shared.",
+        "reusableTitle": "Reusable",
+        "reusableBody": "Leave maxUses unset (or set a higher cap like 100). The link can be paid any number of times. Each click mints a fresh Payment row. Ideal for product pages, donation buttons, and tip jars.",
+        "modesTitle": "Fixed amount vs. customer enters",
+        "modesBody": "Set amountMode to FIXED when you know exactly what to charge (a $29.99 subscription, a 0.05 BTC invoice). Set it to CUSTOMER_ENTERS when you don't — the landing page shows a number input with optional min/max bounds. Useful for donations, top-ups, and pay-what-you-want.",
+        "urlShape": "The share URL",
+        "urlBody": "Every link is identified by a cryptographically random 16-character code. The URL you share with customers looks like:",
+        "urlSecurity": "The code carries 80 bits of entropy — enumeration by guessing is computationally infeasible. We additionally rate-limit lookups by IP and 404 every non-live state (inactive / expired / over-cap / merchant suspended) with the same response so an attacker can't distinguish a real-but-disabled link from a non-existent one.",
+        "api": "API reference",
+        "apiBody": "You can manage links from the dashboard OR via the merchant API. The dashboard UI is just a thin wrapper around these endpoints. Auth is the same as every other merchant-side endpoint — your session cookie.",
+        "requestBody": "Request body",
+        "example": "Example request",
+        "response": "Response",
+        "customerFlow": "Customer flow",
+        "flowBody": "A customer clicks your share URL. The public landing renders the link title, description, image, and either the fixed amount or an input. They press Pay — that mints a Payment row (with a paymentLinkId pointing back to your link) and bounces them to the standard hosted checkout. From there the existing payment lifecycle takes over: coin selection, deposit address + QR, confirmations, and the same set of webhook events you see on direct-API payments. The customer never knows they came in through a link.",
+        "calloutTitle": "Webhook tip",
+        "calloutBody": "Every Payment created from a link carries paymentLinkId on the row + paymentLinkCode in metadata. Both surface in the webhook payload so you can split confirmations by source link without making an extra API call.",
+        "ep": {
+          "create": "Create a new payment link. Returns the link + a shareUrl ready to copy.",
+          "list": "List your links. Cursor-paginated; filter by ?mode= and ?active=.",
+          "detail": "Link detail + usage stats (total, confirmed, in-flight, USD volume) + 10 most-recent payments minted from this link.",
+          "patch": "Edit non-immutable fields: title, description, active, maxUses, expiresAt, success/cancelUrl, amount bounds, metadata. amountMode and mode cannot be changed — create a new link instead.",
+          "delete": "Soft-delete. The link 404s for customers immediately; historical payments minted from it remain intact in your dashboard."
+        },
+        "params": {
+          "title": "Up to 120 chars. Shown at the top of the public landing page (e.g. \"Pro plan — monthly\").",
+          "description": "Optional. Up to 500 chars. Shown under the title.",
+          "imageUrl": "Optional. https:// only. Renders above the title on the landing page (max 200 px tall).",
+          "mode": "'SANDBOX' or 'LIVE'. LIVE requires your merchant account to be APPROVED.",
+          "amountMode": "'FIXED' (you set the amount) or 'CUSTOMER_ENTERS' (customer types it on the landing).",
+          "fixedAmount": "Required when amountMode = FIXED. 0.01 to 1,000,000.",
+          "currency": "ISO 4217 code (e.g. USD, EUR). Required when amountMode = FIXED. Optional restriction when CUSTOMER_ENTERS — null lets the customer pick.",
+          "minAmount": "Optional bound for amountMode = CUSTOMER_ENTERS. Enforced server-side at checkout.",
+          "maxAmount": "Optional bound for amountMode = CUSTOMER_ENTERS. Enforced server-side at checkout.",
+          "maxUses": "Optional. Caps how many payments the link can mint. Leave null for unlimited. Set to 1 for a single-use invoice link.",
+          "expiresAt": "Optional. Link returns 404 to customers after this timestamp regardless of usedCount.",
+          "successUrl": "Optional. Where to send the customer after a confirmed payment. https:// only.",
+          "cancelUrl": "Optional. Where to send the customer if they cancel on the checkout.",
+          "metadata": "Optional JSON object. Copied into every Payment row + every webhook payload as paymentLinkCode + your fields, so you can correlate confirmations back to the source link. Max 4 KB."
+        }
+      }
     },
     "gate": {
       "title": "Verification Required",

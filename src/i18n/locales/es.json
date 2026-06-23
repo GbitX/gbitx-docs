@@ -1933,7 +1933,8 @@
         "coinsRates": "Criptos y tasas",
         "errors": "Errores",
         "rateLimits": "Límites de tasa",
-        "postman": "Colección de Postman"
+        "postman": "Colección de Postman",
+        "paymentLinks": "Enlaces de pago"
       },
       "quickExample": "Ejemplo rápido",
       "keyLimits": "Límites de claves",
@@ -2130,7 +2131,52 @@
         "underpaid": "El monto recibido es menor al requerido."
       },
       "whatToDoResponse": "<strong>Qué hacer con la respuesta:</strong> Redirige a tu cliente a <code>paymentUrl</code>. Seleccionará una criptomoneda, verá la dirección de depósito y enviará el pago. El pago caduca tras 60 minutos.",
-      "whyIdempotency": "<strong>Por qué usarla:</strong> si tu cliente HTTP reintenta un POST tras una caída de red, sin una clave de idempotencia obtienes dos filas de pago para un único pedido lógico. Con la clave, el reintento devuelve el pago original."
+      "whyIdempotency": "<strong>Por qué usarla:</strong> si tu cliente HTTP reintenta un POST tras una caída de red, sin una clave de idempotencia obtienes dos filas de pago para un único pedido lógico. Con la clave, el reintento devuelve el pago original.",
+      "paymentLinks": {
+        "intro": "Los enlaces de pago te permiten aceptar cripto de tus clientes sin escribir código. Crea un enlace en el panel, comparte la URL — por correo, en redes sociales, en un PDF de factura, o como código QR — y el cliente paga en pay.gbitx.com. Cada enlace usa el mismo checkout alojado, la misma pila de webhooks y el mismo esquema de comisiones que un pago vía API directa.",
+        "flavorsTitle": "Dos modalidades",
+        "singleUseTitle": "Uso único",
+        "singleUseBody": "Establece maxUses en 1. El enlace funciona una sola vez; después de que un cliente pague (o incluso simplemente abra el checkout) deja de aceptar nuevas sesiones. Úsalo para facturas dirigidas a un cliente específico, o cualquier pago que no quieras compartir.",
+        "reusableTitle": "Reutilizable",
+        "reusableBody": "Deja maxUses sin definir (o pon un tope más alto, como 100). El enlace puede pagarse cualquier número de veces. Cada clic crea una nueva fila Payment. Ideal para páginas de producto, botones de donación y botes de propinas.",
+        "modesTitle": "Importe fijo vs. lo introduce el cliente",
+        "modesBody": "Pon amountMode en FIXED cuando sepas exactamente qué cobrar (una suscripción de 29,99 $, una factura de 0,05 BTC). Ponlo en CUSTOMER_ENTERS cuando no — la página pública muestra un campo numérico con bornes mín/máx opcionales. Útil para donaciones, recargas y «paga lo que quieras».",
+        "urlShape": "La URL de compartir",
+        "urlBody": "Cada enlace se identifica por un código aleatorio criptográfico de 16 caracteres. La URL que compartes con los clientes se ve así:",
+        "urlSecurity": "El código tiene 80 bits de entropía — la enumeración por fuerza bruta es computacionalmente inviable. Además limitamos las búsquedas por IP y devolvemos 404 para todos los estados no-activos (inactivo / vencido / sobre tope / comercio suspendido) con la misma respuesta, así un atacante no puede distinguir un enlace real-pero-desactivado de uno inexistente.",
+        "api": "Referencia de API",
+        "apiBody": "Puedes administrar los enlaces desde el panel O vía la API de comercio. La interfaz del panel es solo un envoltorio fino alrededor de estos endpoints. La autenticación es la misma que en cualquier otro endpoint del lado del comercio — tu cookie de sesión.",
+        "requestBody": "Cuerpo de la petición",
+        "example": "Petición de ejemplo",
+        "response": "Respuesta",
+        "customerFlow": "Flujo del cliente",
+        "flowBody": "Un cliente hace clic en tu URL compartida. La página pública renderiza el título del enlace, la descripción, la imagen, y o bien el importe fijo o un campo de entrada. Pulsa Pagar — eso crea una fila Payment (con un paymentLinkId que apunta a tu enlace) y le redirige al checkout alojado estándar. Desde ahí el ciclo de vida del pago habitual toma el relevo: selección de cripto, dirección de depósito + QR, confirmaciones, y el mismo conjunto de eventos webhook que ves en los pagos creados directamente vía API. El cliente nunca sabe que entró por un enlace.",
+        "calloutTitle": "Consejo de webhook",
+        "calloutBody": "Cada Payment creado desde un enlace lleva paymentLinkId en la fila + paymentLinkCode en metadata. Los dos aparecen en el payload del webhook para que puedas separar las confirmaciones por enlace de origen sin hacer una llamada API adicional.",
+        "ep": {
+          "create": "Crea un nuevo enlace de pago. Devuelve el enlace + una shareUrl lista para copiar.",
+          "list": "Lista tus enlaces. Paginación por cursor; filtra con ?mode= y ?active=.",
+          "detail": "Detalle del enlace + estadísticas de uso (total, confirmados, en curso, volumen USD) + los 10 pagos más recientes generados desde este enlace.",
+          "patch": "Edita campos no-inmutables: title, description, active, maxUses, expiresAt, success/cancelUrl, límites de importe, metadata. amountMode y mode no se pueden cambiar — crea un enlace nuevo en su lugar.",
+          "delete": "Eliminación lógica. El enlace devuelve 404 a los clientes inmediatamente; los pagos históricos generados desde él permanecen intactos en tu panel."
+        },
+        "params": {
+          "title": "Hasta 120 caracteres. Se muestra en la parte superior de la página pública (por ej. «Pro plan — monthly»).",
+          "description": "Opcional. Hasta 500 caracteres. Se muestra bajo el título.",
+          "imageUrl": "Opcional. Solo https://. Se renderiza sobre el título en la página (altura máx. 200 px).",
+          "mode": "'SANDBOX' o 'LIVE'. LIVE requiere que tu cuenta de comercio esté APPROVED.",
+          "amountMode": "'FIXED' (tú fijas el importe) o 'CUSTOMER_ENTERS' (el cliente lo introduce en la página).",
+          "fixedAmount": "Requerido cuando amountMode = FIXED. 0,01 a 1.000.000.",
+          "currency": "Código ISO 4217 (por ej. USD, EUR). Requerido cuando amountMode = FIXED. Restricción opcional cuando CUSTOMER_ENTERS — null permite al cliente elegir.",
+          "minAmount": "Borde opcional para amountMode = CUSTOMER_ENTERS. Se aplica del lado del servidor al hacer checkout.",
+          "maxAmount": "Borde opcional para amountMode = CUSTOMER_ENTERS. Se aplica del lado del servidor al hacer checkout.",
+          "maxUses": "Opcional. Limita cuántos pagos puede generar el enlace. Déjalo en null para ilimitado. Pon 1 para un enlace de factura de uso único.",
+          "expiresAt": "Opcional. El enlace devuelve 404 a los clientes después de esta marca temporal, independientemente de usedCount.",
+          "successUrl": "Opcional. A dónde enviar al cliente tras un pago confirmado. Solo https://.",
+          "cancelUrl": "Opcional. A dónde enviar al cliente si cancela en el checkout.",
+          "metadata": "Objeto JSON opcional. Se copia en cada fila Payment + cada payload de webhook como paymentLinkCode + tus campos, para que puedas correlacionar las confirmaciones con el enlace de origen. Máx. 4 KB."
+        }
+      }
     },
     "gate": {
       "title": "Verificación requerida",

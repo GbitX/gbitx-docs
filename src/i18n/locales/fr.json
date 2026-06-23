@@ -1933,7 +1933,8 @@
         "coinsRates": "Cryptos & taux",
         "errors": "Erreurs",
         "rateLimits": "Limites de débit",
-        "postman": "Collection Postman"
+        "postman": "Collection Postman",
+        "paymentLinks": "Liens de paiement"
       },
       "quickExample": "Exemple rapide",
       "keyLimits": "Limites de clés",
@@ -2130,7 +2131,52 @@
         "underpaid": "Le montant reçu est inférieur au montant requis."
       },
       "whatToDoResponse": "<strong>Que faire avec la réponse :</strong> Redirigez votre client vers <code>paymentUrl</code>. Il sélectionnera une cryptomonnaie, verra l'adresse de dépôt et enverra le paiement. Le paiement expire après 60 minutes.",
-      "whyIdempotency": "<strong>Pourquoi l'utiliser :</strong> si votre client HTTP réessaie un POST après une coupure réseau, sans clé d'idempotence vous obtenez deux lignes de paiement pour une seule commande logique. Avec la clé, le réessai renvoie le paiement original."
+      "whyIdempotency": "<strong>Pourquoi l'utiliser :</strong> si votre client HTTP réessaie un POST après une coupure réseau, sans clé d'idempotence vous obtenez deux lignes de paiement pour une seule commande logique. Avec la clé, le réessai renvoie le paiement original.",
+      "paymentLinks": {
+        "intro": "Les liens de paiement vous permettent d'accepter des paiements crypto sans écrire de code. Créez un lien dans le tableau de bord, partagez l'URL — par e-mail, sur les réseaux sociaux, dans un PDF de facture, ou sous forme de QR code — et le client paie sur pay.gbitx.com. Chaque lien repose sur la même page de paiement, le même système de webhooks et la même grille tarifaire qu'un paiement créé via l'API.",
+        "flavorsTitle": "Deux types",
+        "singleUseTitle": "Usage unique",
+        "singleUseBody": "Définissez maxUses à 1. Le lien fonctionne une seule fois ; après qu'un client a payé (ou simplement ouvert la page de paiement) il cesse d'accepter de nouvelles sessions. À utiliser pour des factures adressées à un client spécifique, ou tout paiement que vous ne voulez pas partager.",
+        "reusableTitle": "Réutilisable",
+        "reusableBody": "Laissez maxUses non défini (ou fixez un plafond plus élevé comme 100). Le lien peut être payé un nombre illimité de fois. Chaque clic génère une nouvelle ligne Payment. Idéal pour les pages produit, les boutons de don et les pots à pourboires.",
+        "modesTitle": "Montant fixe vs. saisie par le client",
+        "modesBody": "Définissez amountMode sur FIXED quand vous savez exactement quoi facturer (un abonnement à 29,99 $, une facture de 0,05 BTC). Définissez-le sur CUSTOMER_ENTERS quand vous ne savez pas — la page d'accueil affiche un champ de saisie numérique avec des bornes min/max optionnelles. Utile pour les dons, les recharges et le « payez-ce-que-vous-voulez ».",
+        "urlShape": "L'URL de partage",
+        "urlBody": "Chaque lien est identifié par un code aléatoire cryptographique de 16 caractères. L'URL que vous partagez avec les clients ressemble à :",
+        "urlSecurity": "Le code transporte 80 bits d'entropie — l'énumération par devinette est computationnellement infaisable. Nous limitons en plus le débit des recherches par IP et renvoyons 404 pour tous les états non-actifs (inactif / expiré / au-dessus du plafond / marchand suspendu) avec la même réponse, afin qu'un attaquant ne puisse pas distinguer un lien réel mais désactivé d'un lien inexistant.",
+        "api": "Référence API",
+        "apiBody": "Vous pouvez gérer les liens depuis le tableau de bord OU via l'API marchand. L'interface du tableau de bord n'est qu'un wrapper léger autour de ces endpoints. L'authentification est la même que pour tout autre endpoint côté marchand — votre cookie de session.",
+        "requestBody": "Corps de la requête",
+        "example": "Exemple de requête",
+        "response": "Réponse",
+        "customerFlow": "Parcours client",
+        "flowBody": "Un client clique sur votre URL de partage. La page publique affiche le titre du lien, sa description, son image, et soit le montant fixe, soit un champ de saisie. Il appuie sur Payer — cela génère une ligne Payment (avec un paymentLinkId pointant vers votre lien) et le redirige vers la page de paiement hébergée standard. À partir de là, le cycle de vie du paiement habituel prend le relais : sélection de la crypto, adresse de dépôt + QR, confirmations, et le même ensemble d'événements webhook que pour les paiements créés directement via l'API. Le client ne sait jamais qu'il est passé par un lien.",
+        "calloutTitle": "Astuce webhook",
+        "calloutBody": "Chaque Payment créé à partir d'un lien porte paymentLinkId sur la ligne + paymentLinkCode dans les métadonnées. Les deux apparaissent dans le payload du webhook, ce qui vous permet de séparer les confirmations par lien source sans faire d'appel API supplémentaire.",
+        "ep": {
+          "create": "Créer un nouveau lien de paiement. Renvoie le lien + une shareUrl prête à copier.",
+          "list": "Lister vos liens. Pagination par curseur ; filtrer par ?mode= et ?active=.",
+          "detail": "Détail du lien + statistiques d'utilisation (total, confirmés, en cours, volume USD) + les 10 paiements les plus récents générés à partir de ce lien.",
+          "patch": "Modifier les champs non-immuables : title, description, active, maxUses, expiresAt, success/cancelUrl, bornes de montant, metadata. amountMode et mode ne peuvent pas être modifiés — créez un nouveau lien à la place.",
+          "delete": "Suppression douce. Le lien renvoie 404 aux clients immédiatement ; les paiements historiques générés à partir de lui restent intacts dans votre tableau de bord."
+        },
+        "params": {
+          "title": "Jusqu'à 120 caractères. Affiché en haut de la page publique (par ex. « Pro plan — monthly »).",
+          "description": "Optionnel. Jusqu'à 500 caractères. Affiché sous le titre.",
+          "imageUrl": "Optionnel. https:// uniquement. Affiché au-dessus du titre sur la page (hauteur max 200 px).",
+          "mode": "'SANDBOX' ou 'LIVE'. LIVE nécessite que votre compte marchand soit APPROVED.",
+          "amountMode": "'FIXED' (vous fixez le montant) ou 'CUSTOMER_ENTERS' (le client le saisit sur la page).",
+          "fixedAmount": "Requis quand amountMode = FIXED. 0,01 à 1 000 000.",
+          "currency": "Code ISO 4217 (par ex. USD, EUR). Requis quand amountMode = FIXED. Restriction optionnelle quand CUSTOMER_ENTERS — null laisse le client choisir.",
+          "minAmount": "Borne optionnelle pour amountMode = CUSTOMER_ENTERS. Appliquée côté serveur au moment du paiement.",
+          "maxAmount": "Borne optionnelle pour amountMode = CUSTOMER_ENTERS. Appliquée côté serveur au moment du paiement.",
+          "maxUses": "Optionnel. Limite le nombre de paiements que le lien peut générer. Laissez null pour illimité. Mettez 1 pour un lien de facture à usage unique.",
+          "expiresAt": "Optionnel. Le lien renvoie 404 aux clients après cet horodatage, quel que soit usedCount.",
+          "successUrl": "Optionnel. Où rediriger le client après un paiement confirmé. https:// uniquement.",
+          "cancelUrl": "Optionnel. Où rediriger le client s'il annule le paiement.",
+          "metadata": "Objet JSON optionnel. Copié dans chaque ligne Payment + chaque payload de webhook en tant que paymentLinkCode + vos champs, pour que vous puissiez corréler les confirmations au lien source. Max 4 Ko."
+        }
+      }
     },
     "gate": {
       "title": "Vérification requise",
