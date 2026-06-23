@@ -1387,9 +1387,13 @@ const s = {
   container: {
     display: 'flex',
     gap: 0,
-    // Stretch the docs page edge-to-edge inside the dashboard <main>.
-    // Margin -32px cancels the dashboard's 32px padding.
-    margin: '-32px',
+    // Standalone (doc.gbitx.com): no parent padding to cancel. The
+    // legacy in-dashboard build used margin:-32px here to reach the
+    // dashboard <main>'s edges; that negative margin yanked content
+    // off the left edge once we lifted the page into its own app.
+    // Full-viewport-width is now intrinsic — no margin trick needed.
+    width: '100%',
+    minHeight: '100vh',
   },
   sidebar: {
     width: 220,
