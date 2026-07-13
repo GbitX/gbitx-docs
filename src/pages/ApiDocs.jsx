@@ -36,7 +36,8 @@ const SECTIONS = [
   { id: 'pricing',          key: 'developer.docs.nav.pricing',        fallback: 'Pricing & Fees' },
   { id: 'inline-checkout',  key: 'developer.docs.nav.inlineCheckout', fallback: 'Inline Checkout (iframe)' },
   { id: 'js-sdk',           key: 'developer.docs.nav.jsSdk',          fallback: 'JavaScript SDK' },
-  { id: 'mobile-webview',   key: 'developer.docs.nav.mobileWebview',  fallback: 'Mobile (WebView)' },
+  { id: 'mobile-sdks',      key: 'developer.docs.nav.mobileSdks',     fallback: 'Mobile SDKs' },
+  { id: 'mobile-webview',   key: 'developer.docs.nav.mobileWebview',  fallback: 'Mobile (manual WebView)' },
   { id: 'webhooks',         key: 'developer.docs.nav.webhooks',       fallback: 'Webhooks' },
   { id: 'webhook-verify',   key: 'developer.docs.nav.webhookVerify',  fallback: 'Verify Webhooks' },
   { id: 'coins-rates',      key: 'developer.docs.nav.coinsRates',     fallback: 'Coins & Rates' },
@@ -145,7 +146,7 @@ export default function ApiDocs() {
         <section id="getting-started" style={s.section}>
           <h1 style={s.h1}>{t('developer.docs.title', 'GbitX Pay API')}</h1>
           <p style={s.intro}>
-            {t('developer.docs.intro', 'Accept crypto payments from customers worldwide. Three ways to integrate: redirect to our hosted page, embed with the JavaScript SDK for an inline modal, or open the payment page in a WebView from your mobile app. All three deliver the same signed webhook to your backend on confirmation.')}
+            {t('developer.docs.intro', 'Accept crypto payments from customers worldwide. Four ways to integrate: redirect to our hosted page, embed the JavaScript SDK for an inline modal on the web, drop in a native mobile SDK (React Native, iOS, Android, or Flutter), or open the payment page in a WebView yourself. Every path delivers the same signed webhook to your backend on confirmation, which is always the source of truth for fulfilment.')}
           </p>
 
           <div style={s.stepsGrid}>
@@ -193,27 +194,55 @@ export default function ApiDocs() {
           <p style={s.text}>
             <Trans
               i18nKey="developer.docs.authIntro"
-              defaults="All API requests require an API key sent in the <code>Authorization</code> header. Create keys from the API Keys tab in your developer dashboard."
-              components={{ code: CODE_COMPONENT }}
+              defaults="GbitX Pay uses two kinds of API key, both created from the API Keys tab in your developer dashboard. Which one you use depends on <em>where</em> the code runs."
+              components={{ code: CODE_COMPONENT, em: <em /> }}
             />
           </p>
 
-          <Code lang="http">{`Authorization: Bearer gk_live_your_api_key_here`}</Code>
+          <div style={s.callout}>
+            <strong>{t('developer.docs.twoKeyTypes', 'Two key types')}</strong>
+            <ul style={s.list}>
+              <li>
+                <Trans
+                  i18nKey="developer.docs.secretKeyRole"
+                  defaults="<strong>Secret key</strong> (<code>gk_*</code>) — full access: create payments, read payment data, everything. Lives ONLY on your server. Never ship it in an app, a browser, or a public repo."
+                  components={{ code: CODE_COMPONENT, strong: STRONG_COMPONENT }}
+                />
+              </li>
+              <li>
+                <Trans
+                  i18nKey="developer.docs.publishableKeyRole"
+                  defaults="<strong>Publishable key</strong> (<code>pk_*</code>) — safe to ship inside a mobile app. Used only by the mobile SDKs to open the checkout. It cannot create payments or read payment data; it can only fetch non-sensitive checkout config (your public business name + environment). A leaked publishable key exposes nothing you don't already show customers."
+                  components={{ code: CODE_COMPONENT, strong: STRONG_COMPONENT }}
+                />
+              </li>
+            </ul>
+          </div>
+
+          <h3 style={s.h3}>{t('developer.docs.secretKeyAuth', 'Secret key — server requests')}</h3>
+          <p style={s.text}>
+            <Trans
+              i18nKey="developer.docs.secretKeyAuthBody"
+              defaults="Every REST request (creating and reading payments) authenticates with your secret key in the <code>Authorization</code> header:"
+              components={{ code: CODE_COMPONENT }}
+            />
+          </p>
+          <Code lang="http">{`Authorization: Bearer gk_live_your_secret_key_here`}</Code>
 
           <div style={s.callout}>
-            <strong>{t('developer.docs.apiKeyFormats', 'API key formats')}</strong>
+            <strong>{t('developer.docs.apiKeyFormats', 'Key formats — test vs live')}</strong>
             <ul style={s.list}>
               <li>
                 <Trans
                   i18nKey="developer.docs.gkTest"
-                  defaults="<code>gk_test_*</code> — Sandbox mode. No real crypto involved. Use for development and testing."
+                  defaults="<code>gk_test_*</code> / <code>pk_test_*</code> — Sandbox. No real crypto involved. Use for development and testing."
                   components={{ code: CODE_COMPONENT }}
                 />
               </li>
               <li>
                 <Trans
                   i18nKey="developer.docs.gkLive"
-                  defaults="<code>gk_live_*</code> — Live mode. Real blockchain transactions. Use in production."
+                  defaults="<code>gk_live_*</code> / <code>pk_live_*</code> — Live. Real blockchain transactions. Use in production. Live keys work only once your merchant account is approved."
                   components={{ code: CODE_COMPONENT }}
                 />
               </li>
@@ -223,8 +252,8 @@ export default function ApiDocs() {
           <div style={s.warnCallout}>
             <Trans
               i18nKey="developer.docs.keepKeysSecret"
-              defaults="<strong>Keep your keys secret.</strong> Never expose API keys in client-side code, public repositories, or browser requests. If a key is compromised, revoke it immediately from the dashboard and create a new one."
-              components={{ strong: STRONG_COMPONENT }}
+              defaults="<strong>Guard the SECRET key.</strong> Never put a <code>gk_*</code> key in client-side code, a mobile app, a public repository, or a browser request — it can move money. The <code>pk_*</code> publishable key is the opposite: it is meant to ship in your app. If a secret key is ever exposed, revoke it in the dashboard immediately and create a new one."
+              components={{ strong: STRONG_COMPONENT, code: CODE_COMPONENT }}
             />
           </div>
 
@@ -292,6 +321,7 @@ export default function ApiDocs() {
   "payment": {
     "id": "cmo2g79yg000511jh2mmck6im",
     "paymentUrl": "https://pay.gbitx.com/p/cmo2g79yg000511jh2mmck6im",
+    "clientToken": "a1b2c3d4e5f6...",
     "status": "PENDING",
     "amount": "25.00",
     "currency": "USD",
@@ -304,7 +334,14 @@ export default function ApiDocs() {
           <div style={s.callout}>
             <Trans
               i18nKey="developer.docs.whatToDoResponse"
-              defaults="<strong>What to do with the response:</strong> Redirect your customer to <code>paymentUrl</code>. They will select a cryptocurrency, see the deposit address, and send the payment. The payment expires after 60 minutes."
+              defaults="<strong>What to do with the response:</strong> For web, redirect your customer to <code>paymentUrl</code>. They select a cryptocurrency, see the deposit address, and send the payment. The payment expires after 60 minutes."
+              components={{ strong: STRONG_COMPONENT, code: CODE_COMPONENT }}
+            />
+          </div>
+          <div style={s.callout}>
+            <Trans
+              i18nKey="developer.docs.clientTokenNote"
+              defaults="<strong>Using a mobile SDK?</strong> Pass <code>id</code> and <code>clientToken</code> from this response to your app — those are the two values the SDK's <code>present()</code> needs. <code>clientToken</code> is scoped to this single payment and expires with it (60 minutes). See the Mobile SDKs section below."
               components={{ strong: STRONG_COMPONENT, code: CODE_COMPONENT }}
             />
           </div>
@@ -863,11 +900,148 @@ handle.close();`}</Code>
           </div>
         </section>
 
+        {/* ── Mobile SDKs ─────────────────────────────────────────────── */}
+        <section id="mobile-sdks" style={s.section}>
+          <h2 style={s.h2}>{t('developer.docs.nav.mobileSdks', 'Mobile SDKs')}</h2>
+          <p style={s.intro}>
+            {t('developer.docs.sdks.intro', 'The recommended way to accept crypto in a mobile app. Native SDKs for React Native, iOS, Android, and Flutter open the same hardened GbitX checkout in a locked-down in-app WebView and hand your app one typed result. You write no wallet code, handle no addresses, and ship no secret key.')}
+          </p>
+
+          <div style={s.callout}>
+            <Trans
+              i18nKey="developer.docs.sdks.whyOverWebview"
+              defaults="<strong>Prefer these over the manual WebView below.</strong> The SDKs pin the checkout origin, lock navigation to it, authenticate the result message, keep credentials out of logs, and never expose the payment address or token to your app code — hardening you would otherwise have to build and maintain yourself."
+              components={{ strong: STRONG_COMPONENT }}
+            />
+          </div>
+
+          <h3 style={s.h3}>{t('developer.docs.sdks.flow', 'The flow')}</h3>
+          <ol style={s.list}>
+            <li>
+              <Trans i18nKey="developer.docs.sdks.flow1" defaults="Your <strong>server</strong> creates the payment with your <code>gk_*</code> secret key (<code>POST /v1/payments</code>) and gets back <code>id</code> and <code>clientToken</code>." components={{ code: CODE_COMPONENT, strong: STRONG_COMPONENT }} />
+            </li>
+            <li>
+              <Trans i18nKey="developer.docs.sdks.flow2" defaults="Your server sends only <code>paymentId</code> and <code>clientToken</code> to the app — never the secret key." components={{ code: CODE_COMPONENT }} />
+            </li>
+            <li>
+              <Trans i18nKey="developer.docs.sdks.flow3" defaults="The app calls <code>configure()</code> once with your <code>pk_*</code> publishable key, then <code>present(paymentId, clientToken)</code>." components={{ code: CODE_COMPONENT }} />
+            </li>
+            <li>
+              <Trans i18nKey="developer.docs.sdks.flow4" defaults="The SDK opens the hardened checkout and resolves one typed result: <code>confirmed</code>, <code>cancelled</code>, <code>expired</code>, or <code>failed</code>." components={{ code: CODE_COMPONENT }} />
+            </li>
+            <li>{t('developer.docs.sdks.flow5', 'Your backend receives the signed webhook independently — the source of truth for fulfilment.')}</li>
+          </ol>
+
+          <h3 style={s.h3}>{t('developer.docs.sdks.step1', 'Step 1 — your server creates the payment')}</h3>
+          <Code lang="bash">{`curl -X POST ${BASE_URL}/v1/payments \\
+  -H "Authorization: Bearer gk_live_your_SECRET_key" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "amount": 25.00, "currency": "USD", "description": "Order #1234" }'
+
+# Response includes id + clientToken. Send ONLY these two to your app:
+#   { paymentId: payment.id, clientToken: payment.clientToken }`}</Code>
+
+          <h3 style={s.h3}>{t('developer.docs.sdks.step2', 'Step 2 — install the SDK and open the checkout')}</h3>
+          <p style={s.text}>
+            <Trans
+              i18nKey="developer.docs.sdks.publishableNote"
+              defaults="<code>configure()</code> takes your <strong>publishable</strong> key (<code>pk_test_</code> / <code>pk_live_</code>) — the one that is safe to ship in an app. Get it from the API Keys tab in your dashboard. The SDK validates it once against <code>GET /v1/sdk/config</code> and fails fast with a clear error if it is wrong or revoked."
+              components={{ code: CODE_COMPONENT, strong: STRONG_COMPONENT }}
+            />
+          </p>
+
+          <h4 style={s.h4}>React Native</h4>
+          <Code lang="sh">{`npm install @gbitx/pay-react-native react-native-webview`}</Code>
+          <Code lang="tsx">{`import { GbitXPayProvider, GbitXPay } from '@gbitx/pay-react-native';
+
+// 1. wrap your app root once
+//    <GbitXPayProvider>{/* ...your app... */}</GbitXPayProvider>
+
+// 2. configure once, e.g. at startup
+await GbitXPay.configure({ publishableKey: 'pk_live_…' });
+
+// 3. per payment — paymentId + clientToken come from YOUR server
+const result = await GbitXPay.present({ paymentId, clientToken });
+if (result.status === 'confirmed') showThankYou(result.payment); // UX only — fulfil via webhook`}</Code>
+
+          <h4 style={s.h4}>iOS (Swift)</h4>
+          <Code lang="swift">{`// Swift Package Manager:
+//   .package(url: "https://github.com/gbitx1/gbitxpay-ios.git", from: "0.1.0")
+// or CocoaPods:  pod 'GbitXPay', '~> 0.1'
+import GbitXPay
+
+try await GbitXPay.shared.configure(publishableKey: "pk_live_…")   // once, at startup
+let result = try await GbitXPay.shared.present(paymentId: paymentId, clientToken: clientToken)
+if case .confirmed = result { showThankYou() }   // UX only — fulfil via webhook`}</Code>
+
+          <h4 style={s.h4}>Android (Kotlin)</h4>
+          <p style={s.text}>
+            <Trans i18nKey="developer.docs.sdks.androidHost" defaults="The host must be an AndroidX <code>FragmentActivity</code> (e.g. <code>AppCompatActivity</code>) — the checkout is a <code>DialogFragment</code>. minSdk 23." components={{ code: CODE_COMPONENT }} />
+          </p>
+          <Code lang="kotlin">{`// app/build.gradle.kts:  implementation("com.gbitx:pay-android:0.1.0")
+import com.gbitx.pay.*
+import androidx.lifecycle.lifecycleScope
+
+lifecycleScope.launch {
+    GbitXPay.configure(publishableKey = "pk_live_…")   // once; safe to call again
+    val result = GbitXPay.present(activity, paymentId, clientToken)
+    if (result is PaymentResult.Confirmed) showThankYou()   // UX only — fulfil via webhook
+}`}</Code>
+
+          <h4 style={s.h4}>Flutter</h4>
+          <p style={s.text}>
+            <Trans i18nKey="developer.docs.sdks.flutterHost" defaults="Your <code>MainActivity</code> must extend <code>FlutterFragmentActivity</code>, or <code>present()</code> throws <code>host_not_fragment_activity</code>." components={{ code: CODE_COMPONENT }} />
+          </p>
+          <Code lang="dart">{`# pubspec.yaml:  gbitx_pay_flutter: ^0.1.0
+import 'package:gbitx_pay_flutter/gbitx_pay_flutter.dart';
+
+await GbitxPay.instance.configure(publishableKey: 'pk_live_…');   // once, at startup
+final result = await GbitxPay.instance.present(paymentId: paymentId, clientToken: clientToken);
+if (result is PaymentConfirmed) showThankYou();   // UX only — fulfil via webhook`}</Code>
+
+          <h3 style={s.h3}>{t('developer.docs.sdks.results', 'Results')}</h3>
+          <p style={s.text}>
+            {t('developer.docs.sdks.resultsBody', 'present() resolves to one of four outcomes: confirmed, cancelled, expired, or failed. A cancelled or expired payment is a normal result, not an error — the SDK only throws for setup faults (bad or revoked key, no network, wrong environment). The result carries a sanitized payment object with no address, transaction hash, or token.')}
+          </p>
+
+          <h3 style={s.h3}>{t('developer.docs.sdks.availability', 'Packages & requirements')}</h3>
+          <table style={s.table}>
+            <thead>
+              <tr>
+                <th style={s.th}>{t('developer.docs.sdks.col.platform', 'Platform')}</th>
+                <th style={s.th}>{t('developer.docs.sdks.col.package', 'Package (registry)')}</th>
+                <th style={s.th}>{t('developer.docs.sdks.col.min', 'Minimum')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style={s.td}>React Native</td><td style={s.td}><code style={s.inlineCode}>@gbitx/pay-react-native</code> (npm)</td><td style={s.td}>iOS 13 / Android 6</td></tr>
+              <tr><td style={s.td}>iOS</td><td style={s.td}><code style={s.inlineCode}>GbitXPay</code> (SPM + CocoaPods)</td><td style={s.td}>iOS 15</td></tr>
+              <tr><td style={s.td}>Android</td><td style={s.td}><code style={s.inlineCode}>com.gbitx:pay-android</code> (Maven Central)</td><td style={s.td}>Android 6 (API 23)</td></tr>
+              <tr><td style={s.td}>Flutter</td><td style={s.td}><code style={s.inlineCode}>gbitx_pay_flutter</code> (pub.dev)</td><td style={s.td}>iOS 15 / Android 6</td></tr>
+            </tbody>
+          </table>
+
+          <div style={s.warnCallout}>
+            <Trans
+              i18nKey="developer.docs.sdks.webhookTruth"
+              defaults="<strong>Webhooks are the source of truth.</strong> A <code>confirmed</code> result is a UX signal for showing a thank-you screen — it can be forged on a compromised device. Never release goods from it. Fulfil the order only after your backend verifies the signed webhook."
+              components={{ strong: STRONG_COMPONENT, code: CODE_COMPONENT }}
+            />
+          </div>
+        </section>
+
         {/* ── Mobile (WebView) ────────────────────────────────────────── */}
         <section id="mobile-webview" style={s.section}>
-          <h2 style={s.h2}>{t('developer.docs.nav.mobileWebview', 'Mobile (WebView)')}</h2>
+          <h2 style={s.h2}>{t('developer.docs.nav.mobileWebview', 'Mobile (manual WebView)')}</h2>
+          <div style={s.callout}>
+            <Trans
+              i18nKey="developer.docs.mobileUseSdk"
+              defaults="<strong>Most apps should use the Mobile SDKs above instead.</strong> This manual WebView approach is for cases where you can't add the native SDK. It works, but the origin pinning, navigation lock, and result-message authentication are your responsibility — the SDKs do all of that for you."
+              components={{ strong: STRONG_COMPONENT }}
+            />
+          </div>
           <p style={s.text}>
-            {t('developer.docs.mobileIntro', 'Native mobile apps integrate by embedding the payment page in a WebView and intercepting the redirect URL on completion. No native SDK is required — works on iOS, Android, React Native, and Flutter.')}
+            {t('developer.docs.mobileIntro', 'The manual pattern: embed the payment page in a WebView and intercept the redirect URL on completion. Works on iOS, Android, React Native, and Flutter without any SDK.')}
           </p>
 
           <h3 style={s.h3}>{t('developer.docs.pattern', 'Pattern')}</h3>
