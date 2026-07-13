@@ -1897,7 +1897,7 @@
     "docs": {
       "apiReference": "Referência da API",
       "title": "API GbitX Pay",
-      "intro": "Aceite pagamentos cripto de clientes em todo o mundo. Três formas de integrar: redirecione para nossa página hospedada, integre com o SDK JavaScript para um modal embutido ou abra a página de pagamento em um WebView do seu app mobile. As três entregam o mesmo webhook assinado ao seu backend na confirmação.",
+      "intro": "Aceite pagamentos em cripto de clientes no mundo todo. São quatro formas de integração: redirecionar para a nossa página hospedada, incorporar o SDK JavaScript para um modal inline na web, adicionar um SDK mobile nativo (React Native, iOS, Android ou Flutter) ou abrir a página de pagamento em uma WebView por conta própria. Todos os caminhos entregam o mesmo webhook assinado ao seu backend na confirmação, que é sempre a fonte da verdade para o cumprimento do pedido.",
       "baseUrl": "URL base",
       "verifyWebhookSignatures": "Verificar assinaturas de webhook",
       "step1": {
@@ -1922,14 +1922,15 @@
         "payments": "Pagamentos",
         "inlineCheckout": "Checkout embutido (iframe)",
         "jsSdk": "SDK JavaScript",
-        "mobileWebview": "Mobile (WebView)",
+        "mobileWebview": "Mobile (WebView manual)",
         "webhooks": "Webhooks",
         "webhookVerify": "Verificar webhooks",
         "coinsRates": "Criptos e taxas",
         "errors": "Erros",
         "rateLimits": "Limites de taxa",
         "postman": "Coleção do Postman",
-        "paymentLinks": "Links de pagamento"
+        "paymentLinks": "Links de pagamento",
+        "mobileSdks": "Mobile SDKs"
       },
       "quickExample": "Exemplo rápido",
       "keyLimits": "Limites de chaves",
@@ -1969,8 +1970,8 @@
         "getRates": "Obter preços cripto em tempo real em qualquer moeda fiat suportada.",
         "getCurrencies": "Listar todas as moedas fiat suportadas."
       },
-      "apiKeyFormats": "Formatos de chaves API",
-      "authIntro": "Todas as requisições à API exigem uma chave API enviada no cabeçalho <code>Authorization</code>. Crie as chaves na aba Chaves API do seu painel de desenvolvedor.",
+      "apiKeyFormats": "Formatos de chave — teste vs produção",
+      "authIntro": "A GbitX Pay usa dois tipos de chave de API, ambos criados na aba API Keys do seu painel de desenvolvedor. Qual delas você usa depende de <em>onde</em> o código é executado.",
       "clockSync": "Certifique-se de que o relógio do seu servidor esteja sincronizado via NTP. Se o relógio desviar mais do que alguns minutos, webhooks legítimos serão rejeitados como obsoletos.",
       "col": {
         "attempt": "Tentativa",
@@ -2012,8 +2013,8 @@
         "failed": "O pagamento falhou devido a um erro do sistema.",
         "loaded": "Página montada e pronta (use para esconder seu loader)."
       },
-      "gkLive": "<code>gk_live_*</code> — Modo real. Transações reais na blockchain. Use em produção.",
-      "gkTest": "<code>gk_test_*</code> — Modo sandbox. Sem cripto real envolvida. Use para desenvolvimento e testes.",
+      "gkLive": "<code>gk_live_*</code> / <code>pk_live_*</code> — Produção. Transações reais em blockchain. Use em produção. As chaves de produção só funcionam depois que a sua conta de comerciante for aprovada.",
+      "gkTest": "<code>gk_test_*</code> / <code>pk_test_*</code> — Sandbox. Nenhuma cripto real envolvida. Use para desenvolvimento e testes.",
       "http": {
         "200": "Sucesso",
         "201": "Criado (novo pagamento ou chave API)",
@@ -2025,7 +2026,7 @@
         "500": "Erro do servidor — tente novamente ou contate o suporte"
       },
       "inlineIntro": "Incorpore a página de pagamento da GbitX diretamente em seu site como um modal ou painel — sem necessidade de redirecionamento de página inteira. O cliente nunca sai do seu domínio.",
-      "keepKeysSecret": "<strong>Mantenha suas chaves em segredo.</strong> Nunca exponha chaves API em código do lado cliente, repositórios públicos ou requisições do navegador. Se uma chave for comprometida, revogue-a imediatamente no painel e crie uma nova.",
+      "keepKeysSecret": "<strong>Proteja a chave SECRETA.</strong> Nunca coloque uma chave <code>gk_*</code> em código do lado do cliente, em um app mobile, em um repositório público ou em uma requisição de navegador — ela pode movimentar dinheiro. A chave publicável <code>pk_*</code> é o oposto: ela foi feita para ser distribuída no seu app. Se uma chave secreta for exposta em algum momento, revogue-a imediatamente no painel e crie uma nova.",
       "keyLimitsBody": "Máximo de 10 chaves API ativas por conta comercial. As chaves sandbox e reais são contadas juntas.",
       "lifecycle": {
         "awaiting": "Cripto selecionada. Endereço de depósito atribuído. Aguardando o cliente enviar a cripto.",
@@ -2037,7 +2038,7 @@
         "pending": "Pagamento criado. O cliente ainda não selecionou uma cripto.",
         "underpaid": "O cliente enviou menos que o valor necessário."
       },
-      "mobileIntro": "Apps móveis nativos integram incorporando a página de pagamento em uma WebView e interceptando a URL de redirecionamento ao concluir. Nenhum SDK nativo é necessário — funciona em iOS, Android, React Native e Flutter.",
+      "mobileIntro": "O padrão manual: incorpore a página de pagamento em uma WebView e intercepte a URL de redirecionamento na conclusão. Funciona em iOS, Android, React Native e Flutter sem nenhum SDK.",
       "mobileStep1": "O backend do seu app chama <code>POST /v1/payments</code> e retorna a <code>paymentUrl</code> para o app.",
       "mobileStep2": "O app abre a URL em uma WebView (tela cheia, sem necessidade de <code>?embed=1</code>).",
       "mobileStep3": "A WebView intercepta a navegação. Quando a URL corresponder ao seu <code>redirectUrl</code> ou <code>cancelUrl</code>, feche a WebView e roteie dentro do app.",
@@ -2125,7 +2126,7 @@
         "pending": "O cliente selecionou uma cripto. Endereço atribuído.",
         "underpaid": "O valor recebido é menor que o necessário."
       },
-      "whatToDoResponse": "<strong>O que fazer com a resposta:</strong> Redirecione seu cliente para <code>paymentUrl</code>. Ele selecionará uma criptomoeda, verá o endereço de depósito e enviará o pagamento. O pagamento expira após 60 minutos.",
+      "whatToDoResponse": "<strong>O que fazer com a resposta:</strong> Na web, redirecione o seu cliente para <code>paymentUrl</code>. Ele seleciona uma criptomoeda, vê o endereço de depósito e envia o pagamento. O pagamento expira após 60 minutos.",
       "whyIdempotency": "<strong>Por que usá-la:</strong> se seu cliente HTTP reenvia um POST após uma queda de rede, sem uma chave de idempotência você obtém duas linhas de pagamento para um único pedido lógico. Com a chave, a retentativa retorna o pagamento original.",
       "paymentLinks": {
         "intro": "Os links de pagamento permitem aceitar cripto dos clientes sem escrever código. Crie um link no painel, partilhe o URL — por e-mail, em redes sociais, num PDF de fatura, ou como código QR — e o cliente paga em pay.gbitx.com. Todos os links são suportados pelo mesmo checkout hospedado, pelo mesmo sistema de webhooks e pela mesma tabela de taxas que um pagamento via API direta.",
@@ -2170,6 +2171,37 @@
           "successUrl": "Opcional. Para onde enviar o cliente após um pagamento confirmado. Apenas https://.",
           "cancelUrl": "Opcional. Para onde enviar o cliente se cancelar no checkout.",
           "metadata": "Objeto JSON opcional. Copiado em cada linha Payment + cada payload de webhook como paymentLinkCode + os seus campos, para que possa correlacionar as confirmações com o link de origem. Máx. 4 KB."
+        }
+      },
+      "twoKeyTypes": "Dois tipos de chave",
+      "secretKeyRole": "<strong>Chave secreta</strong> (<code>gk_*</code>) — acesso total: criar pagamentos, ler dados de pagamento, tudo. Fica APENAS no seu servidor. Nunca a distribua em um app, em um navegador ou em um repositório público.",
+      "publishableKeyRole": "<strong>Chave publicável</strong> (<code>pk_*</code>) — segura para ser distribuída dentro de um app mobile. Usada apenas pelos SDKs mobile para abrir o checkout. Ela não pode criar pagamentos nem ler dados de pagamento; só pode buscar configurações não sensíveis do checkout (o nome público da sua empresa + o ambiente). Uma chave publicável vazada não expõe nada que você já não mostre aos clientes.",
+      "secretKeyAuth": "Chave secreta — requisições do servidor",
+      "secretKeyAuthBody": "Toda requisição REST (criar e ler pagamentos) se autentica com a sua chave secreta no cabeçalho <code>Authorization</code>:",
+      "clientTokenNote": "<strong>Usando um SDK mobile?</strong> Passe <code>id</code> e <code>clientToken</code> desta resposta para o seu app — esses são os dois valores de que o <code>present()</code> do SDK precisa. O <code>clientToken</code> tem escopo restrito a este único pagamento e expira junto com ele (60 minutos). Veja a seção Mobile SDKs abaixo.",
+      "mobileUseSdk": "<strong>A maioria dos apps deve usar os Mobile SDKs acima em vez disso.</strong> Esta abordagem manual com WebView é para casos em que você não pode adicionar o SDK nativo. Ela funciona, mas o pinning de origem, o bloqueio de navegação e a autenticação da mensagem de resultado são responsabilidade sua — os SDKs fazem tudo isso por você.",
+      "sdks": {
+        "intro": "A forma recomendada de aceitar cripto em um app mobile. Os SDKs nativos para React Native, iOS, Android e Flutter abrem o mesmo checkout endurecido da GbitX em uma WebView in-app bloqueada e entregam ao seu app um único resultado tipado. Você não escreve nenhum código de carteira, não lida com nenhum endereço e não distribui nenhuma chave secreta.",
+        "whyOverWebview": "<strong>Prefira estes ao WebView manual abaixo.</strong> Os SDKs fazem o pinning da origem do checkout, bloqueiam a navegação nela, autenticam a mensagem de resultado, mantêm as credenciais fora dos logs e nunca expõem o endereço de pagamento ou o token ao código do seu app — um endurecimento que, de outra forma, você teria que construir e manter por conta própria.",
+        "flow": "O fluxo",
+        "flow1": "O seu <strong>servidor</strong> cria o pagamento com a sua chave secreta <code>gk_*</code> (<code>POST /v1/payments</code>) e recebe de volta <code>id</code> e <code>clientToken</code>.",
+        "flow2": "O seu servidor envia apenas <code>paymentId</code> e <code>clientToken</code> ao app — nunca a chave secreta.",
+        "flow3": "O app chama <code>configure()</code> uma vez com a sua chave publicável <code>pk_*</code> e, em seguida, <code>present(paymentId, clientToken)</code>.",
+        "flow4": "O SDK abre o checkout endurecido e resolve para um único resultado tipado: <code>confirmed</code>, <code>cancelled</code>, <code>expired</code> ou <code>failed</code>.",
+        "flow5": "O seu backend recebe o webhook assinado de forma independente — a fonte da verdade para o cumprimento do pedido.",
+        "step1": "Passo 1 — o seu servidor cria o pagamento",
+        "step2": "Passo 2 — instale o SDK e abra o checkout",
+        "publishableNote": "O <code>configure()</code> recebe a sua chave <strong>publicável</strong> (<code>pk_test_</code> / <code>pk_live_</code>) — aquela que é segura para distribuir em um app. Obtenha-a na aba API Keys do seu painel. O SDK a valida uma vez contra <code>GET /v1/sdk/config</code> e falha imediatamente com um erro claro se ela estiver incorreta ou revogada.",
+        "androidHost": "O host precisa ser uma <code>FragmentActivity</code> do AndroidX (por exemplo, <code>AppCompatActivity</code>) — o checkout é um <code>DialogFragment</code>. minSdk 23.",
+        "flutterHost": "A sua <code>MainActivity</code> precisa estender <code>FlutterFragmentActivity</code>, ou o <code>present()</code> lança <code>host_not_fragment_activity</code>.",
+        "results": "Resultados",
+        "resultsBody": "O present() resolve para um de quatro desfechos: confirmed, cancelled, expired ou failed. Um pagamento cancelled ou expired é um resultado normal, não um erro — o SDK só lança para falhas de configuração (chave incorreta ou revogada, sem rede, ambiente errado). O resultado carrega um objeto de pagamento sanitizado, sem endereço, hash de transação ou token.",
+        "availability": "Pacotes e requisitos",
+        "webhookTruth": "<strong>Os webhooks são a fonte da verdade.</strong> Um resultado <code>confirmed</code> é um sinal de UX para exibir uma tela de agradecimento — ele pode ser forjado em um dispositivo comprometido. Nunca libere mercadorias a partir dele. Cumpra o pedido somente após o seu backend verificar o webhook assinado.",
+        "col": {
+          "platform": "Plataforma",
+          "package": "Pacote (registry)",
+          "min": "Mínimo"
         }
       }
     },
