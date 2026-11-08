@@ -2134,7 +2134,7 @@
       "whatToDoResponse": "<strong>Qué hacer con la respuesta:</strong> Para web, redirige a tu cliente a <code>paymentUrl</code>. Selecciona una criptomoneda, ve la dirección de depósito y envía el pago. El pago expira después de 60 minutos.",
       "whyIdempotency": "<strong>Por qué usarla:</strong> si tu cliente HTTP reintenta un POST tras una caída de red, sin una clave de idempotencia obtienes dos filas de pago para un único pedido lógico. Con la clave, el reintento devuelve el pago original.",
       "paymentLinks": {
-        "intro": "Los enlaces de pago te permiten aceptar cripto de tus clientes sin escribir código. Crea un enlace en el panel, comparte la URL — por correo, en redes sociales, en un PDF de factura, o como código QR — y el cliente paga en pay.gbitx.com. Cada enlace usa el mismo checkout alojado, la misma pila de webhooks y el mismo esquema de comisiones que un pago vía API directa.",
+        "intro": "Los enlaces de pago te permiten aceptar cripto de tus clientes sin escribir código. Crea un enlace en el panel, comparte la URL — por correo, en redes sociales, en un PDF de factura, o como código QR — y el cliente paga en www.gbitxpay.com. Cada enlace usa el mismo checkout alojado, la misma pila de webhooks y el mismo esquema de comisiones que un pago vía API directa.",
         "flavorsTitle": "Dos modalidades",
         "singleUseTitle": "Uso único",
         "singleUseBody": "Establece maxUses en 1. El enlace funciona una sola vez; después de que un cliente pague (o incluso simplemente abra el checkout) deja de aceptar nuevas sesiones. Úsalo para facturas dirigidas a un cliente específico, o cualquier pago que no quieras compartir.",

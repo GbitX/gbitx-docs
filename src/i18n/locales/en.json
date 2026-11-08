@@ -2134,7 +2134,7 @@
       "whatToDoResponse": "<strong>What to do with the response:</strong> For web, redirect your customer to <code>paymentUrl</code>. They select a cryptocurrency, see the deposit address, and send the payment. The payment expires after 60 minutes.",
       "whyIdempotency": "<strong>Why use it:</strong> if your HTTP client retries a POST after a network blip, without an idempotency key you get two payment rows for one logical order. With the key, the retry returns the original payment.",
       "paymentLinks": {
-        "intro": "Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at pay.gbitx.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.",
+        "intro": "Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at www.gbitxpay.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.",
         "flavorsTitle": "Two flavors",
         "singleUseTitle": "Single-use",
         "singleUseBody": "Set maxUses to 1. The link works once; after a customer pays (or even just opens the checkout) it stops accepting new sessions. Use these for invoices addressed to a specific customer, or any payment you don't want shared.",

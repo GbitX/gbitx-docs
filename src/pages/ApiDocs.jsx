@@ -19,7 +19,7 @@ const INLINE_CODE_STYLE = {
 const CODE_COMPONENT   = <code style={INLINE_CODE_STYLE} />;
 const STRONG_COMPONENT = <strong style={{ color: 'var(--text)' }} />;
 
-const BASE_URL = 'https://gateway.gbitx.com';
+const BASE_URL = 'https://api.gbitxpay.com';
 
 // ── Sections ─────────────────────────────────────────────────────────────────
 //
@@ -47,7 +47,7 @@ const SECTIONS = [
 ];
 
 const SDK_URL = `${BASE_URL}/v1/checkout.js`;
-const PAYMENT_PAGE_URL = 'https://pay.gbitx.com';
+const PAYMENT_PAGE_URL = 'https://www.gbitxpay.com';
 
 // ── Code block component ─────────────────────────────────────────────────────
 
@@ -320,7 +320,7 @@ export default function ApiDocs() {
   "success": true,
   "payment": {
     "id": "cmo2g79yg000511jh2mmck6im",
-    "paymentUrl": "https://pay.gbitx.com/p/cmo2g79yg000511jh2mmck6im",
+    "paymentUrl": "https://www.gbitxpay.com/p/cmo2g79yg000511jh2mmck6im",
     "clientToken": "a1b2c3d4e5f6...",
     "status": "PENDING",
     "amount": "25.00",
@@ -372,7 +372,7 @@ export default function ApiDocs() {
     "expiresAt": "2026-04-17T06:00:00.000Z",
     "confirmedAt": "2026-04-17T05:15:00.000Z",
     "createdAt": "2026-04-17T05:00:00.000Z",
-    "paymentUrl": "https://pay.gbitx.com/p/cmo2g79yg000511jh2mmck6im"
+    "paymentUrl": "https://www.gbitxpay.com/p/cmo2g79yg000511jh2mmck6im"
   }
 }`}</Code>
 
@@ -438,7 +438,7 @@ export default function ApiDocs() {
           <p style={s.intro}>
             {t(
               'developer.docs.paymentLinks.intro',
-              'Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at pay.gbitx.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.',
+              'Payment Links let you accept crypto from customers without writing any code. Create a link in the dashboard, share the URL — by email, on social media, in an invoice PDF, or as a QR code — and the customer pays at www.gbitxpay.com. Every link is backed by the same hosted checkout, the same webhook stack, and the same fee schedule as a direct API payment.',
             )}
           </p>
 
@@ -1735,7 +1735,7 @@ const s = {
   container: {
     display: 'flex',
     gap: 0,
-    // Standalone (doc.gbitx.com): no parent padding to cancel. The
+    // Standalone (doc.gbitxpay.com): no parent padding to cancel. The
     // legacy in-dashboard build used margin:-32px here to reach the
     // dashboard <main>'s edges; that negative margin yanked content
     // off the left edge once we lifted the page into its own app.

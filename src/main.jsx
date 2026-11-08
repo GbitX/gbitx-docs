@@ -6,10 +6,8 @@ import './styles/global.css';
 // i18next init — side-effect import: registers locales + creates the
 // singleton instance that react-i18next + LanguageProvider use. Must
 // run before any component that calls useTranslation() / <Trans>.
-// Same setup as the merchant dashboard so a customer switching
-// language on pay.gbitx.com sees doc.gbitx.com in the same language
-// (LanguageContext persists the choice to localStorage('language')
-// scoped to .gbitx.com).
+// Same setup and locale keys as the merchant dashboard. LanguageContext
+// persists the reader's choice to localStorage('language') on this origin.
 import './i18n';
 import { LanguageProvider } from './contexts/LanguageContext.jsx';
 

@@ -2129,7 +2129,7 @@
       "whatToDoResponse": "<strong>O que fazer com a resposta:</strong> Na web, redirecione o seu cliente para <code>paymentUrl</code>. Ele seleciona uma criptomoeda, vê o endereço de depósito e envia o pagamento. O pagamento expira após 60 minutos.",
       "whyIdempotency": "<strong>Por que usá-la:</strong> se seu cliente HTTP reenvia um POST após uma queda de rede, sem uma chave de idempotência você obtém duas linhas de pagamento para um único pedido lógico. Com a chave, a retentativa retorna o pagamento original.",
       "paymentLinks": {
-        "intro": "Os links de pagamento permitem aceitar cripto dos clientes sem escrever código. Crie um link no painel, partilhe o URL — por e-mail, em redes sociais, num PDF de fatura, ou como código QR — e o cliente paga em pay.gbitx.com. Todos os links são suportados pelo mesmo checkout hospedado, pelo mesmo sistema de webhooks e pela mesma tabela de taxas que um pagamento via API direta.",
+        "intro": "Os links de pagamento permitem aceitar cripto dos clientes sem escrever código. Crie um link no painel, partilhe o URL — por e-mail, em redes sociais, num PDF de fatura, ou como código QR — e o cliente paga em www.gbitxpay.com. Todos os links são suportados pelo mesmo checkout hospedado, pelo mesmo sistema de webhooks e pela mesma tabela de taxas que um pagamento via API direta.",
         "flavorsTitle": "Dois tipos",
         "singleUseTitle": "Uso único",
         "singleUseBody": "Defina maxUses como 1. O link funciona uma vez; depois de o cliente pagar (ou apenas abrir o checkout) deixa de aceitar novas sessões. Use para faturas dirigidas a um cliente específico, ou qualquer pagamento que não queira partilhar.",

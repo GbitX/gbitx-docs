@@ -1,13 +1,13 @@
 # gbitx-docs
 
 Public documentation site for the GbitX payment gateway. Served at
-[doc.gbitx.com](https://doc.gbitx.com).
+[doc.gbitxpay.com](https://doc.gbitxpay.com).
 
 ## What's in here
 
 A standalone Vite + React app that renders the same `ApiDocs.jsx`
 component shown inside the merchant dashboard (at
-pay.gbitx.com/dashboard/docs), without the dashboard chrome or auth
+the GbitXPay dashboard), without the dashboard chrome or auth
 gate.
 
 ```
@@ -41,7 +41,8 @@ Deployed via Vercel. New project pointed at this repo, build command
 1. Push to `GbitX/gbitx-docs` on GitHub.
 2. Vercel → New Project → import the repo. Defaults work — Vite preset
    detects everything.
-3. Vercel → project → Settings → Domains → add `doc.gbitx.com`.
+3. Vercel → project → Settings → Domains → `doc.gbitxpay.com` (primary);
+   `doc.gbitx.com` redirects to it.
 4. DNS (Cloudflare / whoever owns gbitx.com):
    ```
    doc  CNAME  cname.vercel-dns.com
