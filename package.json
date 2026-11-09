@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Public documentation site for the GbitX gateway, served at doc.gbitx.com.",
+  "description": "Public documentation site for GbitXPay, served at doc.gbitxpay.com.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

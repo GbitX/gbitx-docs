@@ -41,12 +41,9 @@ Deployed via Vercel. New project pointed at this repo, build command
 1. Push to `GbitX/gbitx-docs` on GitHub.
 2. Vercel → New Project → import the repo. Defaults work — Vite preset
    detects everything.
-3. Vercel → project → Settings → Domains → `doc.gbitxpay.com` (primary);
-   `doc.gbitx.com` redirects to it.
-4. DNS (Cloudflare / whoever owns gbitx.com):
-   ```
-   doc  CNAME  cname.vercel-dns.com
-   ```
+3. Vercel → project → Settings → Domains → `doc.gbitxpay.com`.
+4. DNS (Cloudflare, `gbitxpay.com` zone): the `doc` record exactly as Vercel
+   shows it.
 5. Verify, force-HTTPS, done.
 
 ## Updating content
